@@ -1,12 +1,18 @@
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Reactivities.API.Extensions;
+using Reactivities.API.Middleware;
+using Reactivities.Domain;
+using Reactivities.Infrastructure.Security;
 using Reactivities.Persistence;
 using Reactivties.Application.Activities;
 using Reactivties.Application.Core;
+using Reactivties.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +20,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddControllers().AddFluentValidation
+ builder.Services.AddControllers(
+ opt =>
+ {
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+  })
+  .AddFluentValidation
   (config =>
   {
       config.RegisterValidatorsFromAssemblyContaining<Create>();
@@ -24,8 +36,9 @@ builder.Services.AddControllers().AddFluentValidation
     /*var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
 });*/
-/*builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddIdentityServices(builder.Configuration);*/
+//builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -45,7 +58,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-//app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 
 // Configure the HTTP request pipeline.
@@ -83,7 +96,7 @@ app.MapControllers();
 
 app.MapControllers();
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehaviour", true);
+//AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehaviour", true);
 
 using var scope = app.Services.CreateScope();
 
@@ -92,9 +105,9 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<DataContext>();
-    // var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedData(context);
+    await Seed.SeedData(context, userManager);
 }
 catch (Exception ex)
 {

@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Reactivities.Domain;
 using Reactivities.Persistence;
 using Reactivties.Application.Core;
@@ -13,7 +16,7 @@ namespace Reactivties.Application.Activities
     public class Details
     {
 
-        public class Query : IRequest<Result<Activity>>
+        public class Query : IRequest<Result<ActivityDTO>>
         {
 
             public Guid Id { get; set; }
@@ -21,20 +24,24 @@ namespace Reactivties.Application.Activities
         }
 
 
-        public class Handler : IRequestHandler<Query, Result<Activity>>
+        public class Handler : IRequestHandler<Query, Result<ActivityDTO>>
         {
             private readonly DataContext _context;
+            private readonly IMapper _mapper;
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IMapper mapper)
             {
                 _context = context;
+                _mapper = mapper;
             }
 
-            public async Task<Result<Activity>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<ActivityDTO>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var activity= await _context.Activities.FindAsync(request.Id);
+                var activity= await _context.Activities
+                    .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider) // To remove the include function and make it done with the automapper.
+                    .FirstOrDefaultAsync(x => x.Id == request.Id);
 
-                return  Result<Activity>.Success(activity);
+                return  Result<ActivityDTO>.Success(activity);
             }
         }
 
