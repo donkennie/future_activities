@@ -33,7 +33,8 @@ namespace Reactivities.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await _userManager.Users.Include(p => p.Photos)
+                .FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
             if (user == null) return Unauthorized("Invalid email");
 
@@ -41,14 +42,8 @@ namespace Reactivities.API.Controllers
 
             if (result.Succeeded)
             {
-                return new UserDTO
-                {
-                    DisplayName = user.DisplayName,
-                    Image = null,
-                    Token = _tokenService.CreateToken(user),
-                    Username = user.UserName
-                };
-                // return CreateUserObject(user);
+               
+                 return CreateUserObject(user);
             }
 
             //  if (user.UserName == "bob") user.EmailConfirmed = true;
@@ -90,13 +85,7 @@ namespace Reactivities.API.Controllers
             if (result.Succeeded)
             {
                 return CreateUserObject(user);
-               /* return new UserDTO
-                {
-                    DisplayName = user.DisplayName,
-                    Image = null,
-                    Token = _tokenService.CreateToken(user),
-                    Username = user.UserName
-                };*/
+               
             }
 
             //if (!result.Succeeded) return BadRequest("Problem registering user");
@@ -119,7 +108,7 @@ namespace Reactivities.API.Controllers
         [HttpGet]
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
         {
-            var user = await _userManager.Users//.Include(p => p.Photos)
+            var user = await _userManager.Users.Include(p => p.Photos)
                 .FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
         //    await SetRefreshToken(user);
             return CreateUserObject(user);
@@ -131,7 +120,7 @@ namespace Reactivities.API.Controllers
             return new UserDTO
             {
                 DisplayName = user.DisplayName,
-              //  Image = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
+                Image = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
                 Token = _tokenService.CreateToken(user),
                 Username = user.UserName
             };

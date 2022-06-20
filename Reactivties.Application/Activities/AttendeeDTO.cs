@@ -1,13 +1,12 @@
-﻿using Reactivities.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reactivties.Application.Profiles
+namespace Reactivties.Application.Activities
 {
-    public class Profile
+     public class AttendeeDTO
     {
         public string Username { get; set; }
 
@@ -16,7 +15,5 @@ namespace Reactivties.Application.Profiles
         public string Bio { get; set; }
 
         public string Image { get; set; }
-
-        public ICollection<Photo> Photos{ get; set; }
     }
 }

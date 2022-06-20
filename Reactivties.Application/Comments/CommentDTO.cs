@@ -1,22 +1,18 @@
-﻿using Reactivities.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reactivties.Application.Profiles
+namespace Reactivties.Application.Comments
 {
-    public class Profile
+    public class CommentDTO
     {
+        public int Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string Body { get; set; }
         public string Username { get; set; }
-
         public string DisplayName { get; set; }
-
-        public string Bio { get; set; }
-
         public string Image { get; set; }
-
-        public ICollection<Photo> Photos{ get; set; }
     }
 }
