@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Reactivities.API.Services;
 using Reactivities.Domain;
+using Reactivities.Infrastructure.Photos;
 using Reactivities.Infrastructure.Security;
 using Reactivities.Persistence;
+using Reactivties.Application.Interfaces;
 using System.Text;
 
 namespace Reactivities.API.Extensions
@@ -21,8 +23,8 @@ namespace Reactivities.API.Extensions
                 opt.SignIn.RequireConfirmedEmail = true;
             })
             .AddEntityFrameworkStores<DataContext>()
-            .AddSignInManager<SignInManager<AppUser>>();
-           // .AddDefaultTokenProviders();
+            .AddSignInManager<SignInManager<AppUser>>()
+            .AddDefaultTokenProviders();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
 
@@ -61,9 +63,11 @@ namespace Reactivities.API.Extensions
                 });
             });
             services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             services.AddScoped<TokenService>();
 
-           //  services.AddAuthentication();
+             services.AddAuthentication();
 
             return services;
         }

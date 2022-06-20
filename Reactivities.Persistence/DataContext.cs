@@ -19,6 +19,8 @@ namespace Reactivities.Persistence
 
         public DbSet<ActivityAttendee> ActivityAttendees { get; set; }
 
+        public DbSet<Photo> Photos { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

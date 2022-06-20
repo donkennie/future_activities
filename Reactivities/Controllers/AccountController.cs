@@ -29,7 +29,7 @@ namespace Reactivities.API.Controllers
             _tokenService = tokenService;
         }
 
-
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDto)
         {
@@ -37,12 +37,26 @@ namespace Reactivities.API.Controllers
 
             if (user == null) return Unauthorized("Invalid email");
 
-            if (user.UserName == "bob") user.EmailConfirmed = true;
-
-            if (!user.EmailConfirmed) return Unauthorized("Email not confirmed");
-
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-            return Ok();
+
+            if (result.Succeeded)
+            {
+                return new UserDTO
+                {
+                    DisplayName = user.DisplayName,
+                    Image = null,
+                    Token = _tokenService.CreateToken(user),
+                    Username = user.UserName
+                };
+                // return CreateUserObject(user);
+            }
+
+            //  if (user.UserName == "bob") user.EmailConfirmed = true;
+
+            //  if (!user.EmailConfirmed) return Unauthorized("Email not confirmed");
+
+            return Unauthorized();
+           // return Ok();
         }
 
 
@@ -52,13 +66,16 @@ namespace Reactivities.API.Controllers
         {
             if (await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
             {
-                ModelState.AddModelError("email", "Email taken");
-                return ValidationProblem();
+                return BadRequest("Email taken");
+                //ModelState.AddModelError("email", "Email taken");
+               // return ValidationProblem();
             }
             if (await _userManager.Users.AnyAsync(x => x.UserName == registerDto.Username))
             {
-                ModelState.AddModelError("username", "Username taken");
-                return ValidationProblem();
+
+                return BadRequest("Username taken");
+                //ModelState.AddModelError("username", "Username taken");
+                //return ValidationProblem();
             }
 
             var user = new AppUser
@@ -70,18 +87,31 @@ namespace Reactivities.API.Controllers
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-            if (!result.Succeeded) return BadRequest("Problem registering user");
+            if (result.Succeeded)
+            {
+                return CreateUserObject(user);
+               /* return new UserDTO
+                {
+                    DisplayName = user.DisplayName,
+                    Image = null,
+                    Token = _tokenService.CreateToken(user),
+                    Username = user.UserName
+                };*/
+            }
 
-            var origin = Request.Headers["origin"];
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            //if (!result.Succeeded) return BadRequest("Problem registering user");
 
-            var verifyUrl = $"{origin}/account/verifyEmail?token={token}&email={user.Email}";
-            var message = $"<p>Please click the below link to verify your email address:</p><p><a href='{verifyUrl}'>Click to verify email</a></p>";
+            //var origin = Request.Headers["origin"];
+            // var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            //token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-           // await _emailSender.SendEmailAsync(user.Email, "Please verify email", message);
+            //var verifyUrl = $"{origin}/account/verifyEmail?token={token}&email={user.Email}";
+            // var message = $"<p>Please click the below link to verify your email address:</p><p><a href='{verifyUrl}'>Click to verify email</a></p>";
 
-            return Ok("Registration success - please verify email");
+            // await _emailSender.SendEmailAsync(user.Email, "Please verify email", message);
+
+            return BadRequest("Problem registering user");
+            //return Ok("Registration success - please verify email");
         }
 
 
