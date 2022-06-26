@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Reactivities.API.Extensions;
 using Reactivities.API.Middleware;
+using Reactivities.API.SignalR;
 using Reactivities.Domain;
 using Reactivities.Infrastructure.Security;
 using Reactivities.Persistence;
@@ -36,20 +37,15 @@ builder.Services.AddControllers();
     /*var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
 });*/
-//builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
-builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+//builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<DataContext>(opt =>
-{
-    opt.UseSqlServer(connectionString);
-});
 
-builder.Services.AddMediatR(typeof(List.Handler).Assembly);
+//builder.Services.AddMediatR(typeof(List.Handler).Assembly);
 
-builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+//builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 //Configure the request pipeline
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -91,10 +87,10 @@ app.UseAuthentication();
 
 
 app.MapControllers();
-//app.endpoints.MapHub<ChatHub>("/chat");
+app.MapHub<ChatHub>("/chat"); 
 //app.MapFallbackToController("Index", "Fallback");
 
-app.MapControllers();
+//app.MapControllers();
 
 //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehaviour", true);
 

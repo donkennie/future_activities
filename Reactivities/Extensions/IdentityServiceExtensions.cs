@@ -40,7 +40,7 @@ namespace Reactivities.API.Extensions
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero
                     };
-                  /*  opt.Events = new JwtBearerEvents
+                    opt.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
@@ -52,7 +52,7 @@ namespace Reactivities.API.Extensions
                             }
                             return Task.CompletedTask;
                         }
-                    };*/
+                    };  
                 });
 
             services.AddAuthorization(opt =>
@@ -63,8 +63,8 @@ namespace Reactivities.API.Extensions
                 });
             });
             services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
-            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
-            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+            //services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            //services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             services.AddScoped<TokenService>();
 
              services.AddAuthentication();
