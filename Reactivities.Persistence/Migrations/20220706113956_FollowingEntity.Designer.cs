@@ -12,8 +12,8 @@ using Reactivities.Persistence;
 namespace Reactivities.Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220703210048_AddFollowingEntity")]
-    partial class AddFollowingEntity
+    [Migration("20220706113956_FollowingEntity")]
+    partial class FollowingEntity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -441,7 +441,7 @@ namespace Reactivities.Persistence.Migrations
                     b.HasOne("Reactivities.Domain.AppUser", "Observer")
                         .WithMany("Followings")
                         .HasForeignKey("ObserverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Reactivities.Domain.AppUser", "Target")

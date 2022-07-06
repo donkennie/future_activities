@@ -439,7 +439,7 @@ namespace Reactivities.Persistence.Migrations
                     b.HasOne("Reactivities.Domain.AppUser", "Observer")
                         .WithMany("Followings")
                         .HasForeignKey("ObserverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Reactivities.Domain.AppUser", "Target")

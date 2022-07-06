@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Reactivties.Application.Activities;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Reactivties.Application.Profiles;
 
 namespace Reactivities.API.Controllers
 {
     public class ProfilesController :BaseAPIController
     {
+       // [AllowAnonymous]
         [HttpGet("{username}")]
         public async Task<IActionResult> GetProfile(string username)
         {
