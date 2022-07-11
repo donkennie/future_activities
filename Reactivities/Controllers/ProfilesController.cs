@@ -7,11 +7,13 @@ namespace Reactivities.API.Controllers
     public class ProfilesController :BaseAPIController
     {
        // [AllowAnonymous]
-        [HttpGet("{username}")]
+        [HttpPost("{username}")]
         public async Task<IActionResult> GetProfile(string username)
         {
             return HandleResult(await Mediator.Send(new Details.Query { Username = username }));
         }
+
+       
 
       /*  [HttpPut]
         public async Task<IActionResult> Edit(Edit.Command command)

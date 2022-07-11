@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Reactivities.Domain;
 using Reactivities.Persistence;
 using Reactivties.Application.Core;
+using Reactivties.Application.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,17 +29,19 @@ namespace Reactivties.Application.Activities
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
+            private readonly IUserAccessor _userAccessor;
 
-            public Handler(DataContext context, IMapper mapper)
+            public Handler(DataContext context, IMapper mapper, IUserAccessor userAccessor)
             {
                 _context = context;
                 _mapper = mapper;
+                _userAccessor = userAccessor;
             }
 
             public async Task<Result<ActivityDTO>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var activity= await _context.Activities
-                    .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider) // To remove the include function and make it done with the automapper.
+                    .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider, new { currentUsername = _userAccessor.GetUsername()}) // To remove the include function and make it done with the automapper.
                     .FirstOrDefaultAsync(x => x.Id == request.Id);
 
                 return  Result<ActivityDTO>.Success(activity);
