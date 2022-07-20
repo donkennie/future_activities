@@ -41,9 +41,7 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 //builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
-
-
-//builder.Services.AddMediatR(typeof(List.Handler).Assembly);
+//builder.Services.AddMediatR(typeof(List   .Handler).Assembly);
 
 //builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 //Configure the request pipeline

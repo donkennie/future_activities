@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Reactivities.Domain;
 using Reactivities.Persistence;
 using Reactivties.Application.Activities;
+using Reactivties.Application.Core;
 
 namespace Reactivities.API.Controllers
 {
@@ -15,15 +16,15 @@ namespace Reactivities.API.Controllers
     {
       
         [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetActivities()
+        
+        public async Task<IActionResult> GetActivities([FromQuery] PagingParams param)
         {
-            return HandleResult( await Mediator.Send(new List.Query()));
+            return HandlePagedResult( await Mediator.Send(new List.Query { Params = param}));
         }
 
 
         [HttpGet("{id}")] //activities/id
-        [AllowAnonymous]
+        
         public async Task<IActionResult> GetActivity(Guid id)
         {
 
@@ -31,7 +32,7 @@ namespace Reactivities.API.Controllers
 
         }
 
-        [AllowAnonymous]
+        
         [HttpPost]
         public async Task<IActionResult> CreateActivity([FromBody]Activity activity)
         {
@@ -41,7 +42,7 @@ namespace Reactivities.API.Controllers
 
         [Authorize(Policy = "IsActivityHost")]
         [HttpPut("{id}")]
-        [AllowAnonymous]
+        
         public async Task<IActionResult> EditActivity(Guid id, Activity activity)
         {
             activity.Id = id;
