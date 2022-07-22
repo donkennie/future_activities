@@ -17,7 +17,6 @@ namespace Reactivties.Application.Activities
     public class List
     {
 
-
         public class Query : IRequest<Result<PagedList<ActivityDTO>>>
         {
             public PagingParams Params { get; set; }
